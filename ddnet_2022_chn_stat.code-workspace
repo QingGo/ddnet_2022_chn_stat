@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"name": "ddnet_2022_chn_stat_backend",
+			"path": "ddnet_2022_chn_stat_backend"
+		},
+		{
+			"name": "ddnet_2022_chn_stat_frontend",
+			"path": "ddnet_2022_chn_stat_frontend"
+		},
+		{
+			"name": "ddnet_2022_chn_stat",
+			"path": "."
+		}
+	],
+	"settings": {}
+}
