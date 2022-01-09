@@ -1,3 +1,6 @@
 [submodule "ddnet_2022_chn_stat_backend"]
 	path = ddnet_2022_chn_stat_backend
 	url = git@github.com:QingGo/ddnet_2022_chn_stat_backend.git
+[submodule "ddnet_2022_chn_stat_frontend"]
+	path = ddnet_2022_chn_stat_frontend
+	url = git@github.com:QingGo/ddnet_2022_chn_stat_frontend.git
