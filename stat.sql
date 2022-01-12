@@ -358,5 +358,4 @@ from
     join most_finished_map_2021_table c
     on a.Name = c.Name
 order by
-    total_points_earned desc
-limit 100;
+    total_points_earned desc;
