@@ -1,4 +1,6 @@
 -- use bigquery
+-- to-do?
+-- 最多组队的人，同伴名？
 with ddnet_race_with_map_infos as (
     select
         a.Map as Map,
@@ -15,7 +17,7 @@ with ddnet_race_with_map_infos as (
             DAYOFWEEK
             FROM
                 a.Timestamp AT TIME ZONE "Asia/Shanghai"
-        ) as day_of_week,
+        ) as weekday,
         EXTRACT(
             HOUR
             FROM
@@ -61,7 +63,7 @@ ddnet_race_with_map_infos_2021 as (
         Stars,
         Mapper,
         Timestamp_MAP,
-        day_of_week,
+        weekday,
         hour,
         minute,
         second,
@@ -95,6 +97,7 @@ ddnet_race_with_map_infos_2021 as (
         Timestamp < '2022-01-01 08:00:00'
         and Timestamp >= '2021-01-01 08:00:00'
 ),
+-- 过图次数最多的地图
 most_finished_map_2021_table as (
     select
         Name,
@@ -334,6 +337,7 @@ stat_2021_without_repeat as (
     group by
         Name
 ),
+-- 熬夜战神表
 day_latest_finish_time_2021 as (
     select
         Name,
@@ -357,16 +361,59 @@ day_latest_finish_time_2021 as (
         )
     where
         day_latest_finish_rank = 1
+),
+-- 最常过图的时间段
+day_most_finish_hour_2021 as (
+    select
+        Name,
+        most_finish_hour,
+        most_finish_hour_count
+    from
+        (
+            select
+                Name,
+                hour as most_finish_hour,
+                count(*) as most_finish_hour_count,
+                ROW_NUMBER() over (
+                    partition by Name
+                    order by
+                        count(*) desc
+                ) as most_finish_hour_rank
+            from
+                ddnet_race_with_map_infos_2021
+            group by
+                Name,
+                hour
+        )
+    where
+        most_finish_hour_rank = 1
+),
+-- 最常过图是星期几
+day_most_finish_weekday_2021 as (
+    select
+        Name,
+        most_finish_weekday,
+        most_finish_weekday_count
+    from
+        (
+            select
+                Name,
+                weekday as most_finish_weekday,
+                count(*) as most_finish_weekday_count,
+                ROW_NUMBER() over (
+                    partition by Name
+                    order by
+                        count(*) desc
+                ) as most_finish_weekday_rank
+            from
+                ddnet_race_with_map_infos_2021
+            group by
+                Name,
+                weekday
+        )
+    where
+        most_finish_weekday_rank = 1
 )
--- select
---     *
--- from
---     day_latest_finish_time_2021
--- limit
---     100;
--- maybe to-do
--- 最晚完成时间，什么时候算第二天，6 点？
--- 最多组队的人，同伴名？
 select
     a.Name,
     total_points_earned,
@@ -408,11 +455,17 @@ select
     c.map_finished_count,
     c.most_finished_map_2021_spend_minues,
     d.day_latest_finish_time,
-    d.day_latest_finish_map
+    d.day_latest_finish_map,
+    e.most_finish_hour,
+    e.most_finish_hour_count,
+    f.most_finish_weekday,
+    f.most_finish_weekday_count
 from
     stat_with_repeat a
     join stat_2021_without_repeat b on a.Name = b.Name
     join most_finished_map_2021_table c on a.Name = c.Name
     join day_latest_finish_time_2021 d on a.Name = d.Name
+    join day_most_finish_hour_2021 e on a.Name = e.Name
+    join day_most_finish_weekday_2021 f on a.Name = f.Name
 order by
     total_points_earned desc;
