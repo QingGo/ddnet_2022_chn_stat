@@ -34,5 +34,4 @@ deploy_be:
 deploy_fe:
 	cd ddnet_2022_chn_stat_frontend; \
 	npm run build; \
-	npm run upload; \
-	scp -r ./build/index.html $(ssh_server):~/ddnet_2022_chn_stat_deploy/build/
+	npm run upload;
