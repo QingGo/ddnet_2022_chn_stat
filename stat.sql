@@ -19,6 +19,11 @@ with ddnet_race_with_map_infos as (
                 a.Timestamp AT TIME ZONE "Asia/Shanghai"
         ) as weekday,
         EXTRACT(
+            DATE
+            FROM
+                a.Timestamp AT TIME ZONE "Asia/Shanghai"
+        ) as date,
+        EXTRACT(
             HOUR
             FROM
                 a.Timestamp AT TIME ZONE "Asia/Shanghai"
@@ -64,6 +69,7 @@ ddnet_race_with_map_infos_2021 as (
         Mapper,
         Timestamp_MAP,
         weekday,
+        date,
         hour,
         minute,
         second,
@@ -413,6 +419,26 @@ day_most_finish_weekday_2021 as (
         )
     where
         most_finish_weekday_rank = 1
+),
+-- 在多少天有过图记录
+days_count_has_records_2021 as (
+    select
+        Name,
+        count(*) as days_count_has_records_2021
+    from
+        (
+            select
+                Name,
+                date,
+                count(*)
+            from
+                ddnet_race_with_map_infos_2021
+            group by
+                Name,
+                date
+        )
+    group by
+        Name
 )
 select
     a.Name,
@@ -459,7 +485,8 @@ select
     e.most_finish_hour,
     e.most_finish_hour_count,
     f.most_finish_weekday,
-    f.most_finish_weekday_count
+    f.most_finish_weekday_count,
+    g.days_count_has_records_2021
 from
     stat_with_repeat a
     join stat_2021_without_repeat b on a.Name = b.Name
@@ -467,5 +494,6 @@ from
     join day_latest_finish_time_2021 d on a.Name = d.Name
     join day_most_finish_hour_2021 e on a.Name = e.Name
     join day_most_finish_weekday_2021 f on a.Name = f.Name
+    join days_count_has_records_2021 g on a.Name = g.Name
 order by
     total_points_earned desc;
