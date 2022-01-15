@@ -1,6 +1,8 @@
 -- use bigquery
 -- to-do?
+-- 分数/过图时间 超越了 %xx 的玩家
 -- 最多组队的人，同伴名？
+-- 原始过图记录+地图全表
 with ddnet_race_with_map_infos as (
     select
         a.Map as Map,
@@ -16,27 +18,27 @@ with ddnet_race_with_map_infos as (
         EXTRACT(
             DAYOFWEEK
             FROM
-                a.Timestamp AT TIME ZONE "Asia/Shanghai"
+                a.Timestamp AT TIME ZONE "Asia/Almaty"
         ) as weekday,
         EXTRACT(
             DATE
             FROM
-                a.Timestamp AT TIME ZONE "Asia/Shanghai"
+                a.Timestamp AT TIME ZONE "Asia/Almaty"
         ) as date,
         EXTRACT(
             HOUR
             FROM
-                a.Timestamp AT TIME ZONE "Asia/Shanghai"
+                a.Timestamp AT TIME ZONE "Asia/Almaty"
         ) as hour,
         EXTRACT(
             MINUTE
             FROM
-                a.Timestamp AT TIME ZONE "Asia/Shanghai"
+                a.Timestamp AT TIME ZONE "Asia/Almaty"
         ) as minute,
         EXTRACT(
             SECOND
             FROM
-                a.Timestamp AT TIME ZONE "Asia/Shanghai"
+                a.Timestamp AT TIME ZONE "Asia/Almaty"
         ) as second,
         ROW_NUMBER() over (
             partition by a.Map,
@@ -56,6 +58,7 @@ with ddnet_race_with_map_infos as (
     where
         a.Server = 'CHN'
 ),
+-- 原始过图记录+地图 2021 表
 ddnet_race_with_map_infos_2021 as (
     select
         Map,
@@ -100,8 +103,8 @@ ddnet_race_with_map_infos_2021 as (
     from
         ddnet_race_with_map_infos
     where
-        Timestamp < '2022-01-01 08:00:00'
-        and Timestamp >= '2021-01-01 08:00:00'
+        Timestamp < '2022-01-01 06:00:00'
+        and Timestamp >= '2021-01-01 06:00:00'
 ),
 -- 过图次数最多的地图
 most_finished_map_2021_table as (
@@ -140,6 +143,7 @@ most_finished_map_2021_table as (
     where
         map_name_rank_finished_count_desc = 1
 ),
+-- 不对记录去重统计的基本信息表
 stat_with_repeat as (
     select
         Name,
@@ -212,6 +216,7 @@ stat_with_repeat as (
     group by
         Name
 ),
+-- 对记录去重统计的基本信息表
 stat_2021_without_repeat as (
     select
         Name,
@@ -353,7 +358,7 @@ day_latest_finish_time_2021 as (
         (
             select
                 Name,
-                FORMAT_TIMESTAMP("%Y-%m-%d %H:%M:%S", Timestamp, "Asia/Shanghai") as day_latest_finish_time,
+                FORMAT_TIMESTAMP("%Y-%m-%d %H:%M:%S", Timestamp, "Asia/Almaty") as day_latest_finish_time,
                 Map as day_latest_finish_map,
                 ROW_NUMBER() over (
                     partition by Name
@@ -439,6 +444,10 @@ days_count_has_records_2021 as (
         )
     group by
         Name
+),
+-- 分数超越百分比
+points_earned_over_percent_2021 as (
+    select Name from stat_2021_without_repeat 
 )
 select
     a.Name,

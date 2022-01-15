@@ -29,6 +29,12 @@ deploy_be:
 		mv ddnet_2022_chn_stat_backend_linux64_new ddnet_2022_chn_stat_backend_linux64 || true"
 	ssh $(ssh_server) "cd ddnet_2022_chn_stat_deploy; \
 		CSV_FILE_PATH=./results.csv nohup ./ddnet_2022_chn_stat_backend_linux64 >> ddnet_2022_chn_stat_backend_linux64.log 2>&1 &"
+
+.PHONY: restart_be
+restart_be:
+	ssh $(ssh_server) "ps -aux | grep ddnet_2022_chn_stat_backend_linux64 | grep -v 'grep' | awk '{print \$$2}' | xargs kill || true"
+	ssh $(ssh_server) "cd ddnet_2022_chn_stat_deploy; \
+		CSV_FILE_PATH=./results.csv nohup ./ddnet_2022_chn_stat_backend_linux64 >> ddnet_2022_chn_stat_backend_linux64.log 2>&1 &"
 	
 .PHONY: deploy_fe
 deploy_fe:
