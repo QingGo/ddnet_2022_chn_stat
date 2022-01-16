@@ -586,16 +586,16 @@ select
     l.favorite_teammate_team_count
 from
     stat_2021_with_repeat a
-    join stat_2021_without_repeat b on a.Name = b.Name
-    join most_finished_map_2021_table c on a.Name = c.Name
-    join day_latest_finish_time_2021 d on a.Name = d.Name
-    join day_most_finish_hour_2021 e on a.Name = e.Name
-    join day_most_finish_weekday_2021 f on a.Name = f.Name
-    join days_count_has_records_2021 g on a.Name = g.Name
+    left join stat_2021_without_repeat b on a.Name = b.Name
+    left join most_finished_map_2021_table c on a.Name = c.Name
+    left join day_latest_finish_time_2021 d on a.Name = d.Name
+    left join day_most_finish_hour_2021 e on a.Name = e.Name
+    left join day_most_finish_weekday_2021 f on a.Name = f.Name
+    left join days_count_has_records_2021 g on a.Name = g.Name
     cross join player_count_2021 h
-    join points_earned_rank_2021 i on a.Name = i.Name
-    join finish_time_sum_hours_rank_2021 j on a.Name = j.Name
-    join teammate_count_2021 k on a.Name = k.Name
-    join most_favorite_teammate_2021 l on a.Name = l.Name
+    left join points_earned_rank_2021 i on a.Name = i.Name
+    left join finish_time_sum_hours_rank_2021 j on a.Name = j.Name
+    left join teammate_count_2021 k on a.Name = k.Name
+    left join most_favorite_teammate_2021 l on a.Name = l.Name
 order by
     total_points_earned desc;
