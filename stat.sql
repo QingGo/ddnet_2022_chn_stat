@@ -1,6 +1,4 @@
 -- use bigquery
--- to-do?
--- 最多组队的人，同伴名？
 -- 原始过图记录+地图全表
 with ddnet_race_with_map_infos as (
     select
@@ -472,6 +470,65 @@ finish_time_sum_hours_rank_2021 as (
         ) as finish_time_sum_hours_rank
     from
         stat_2021_with_repeat
+),
+-- 玩家视角的组队表
+player_viewpoint_team_2021 as (
+    select
+        a.Name as Name,
+        b.Name as teammate_name,
+        a.ID as team_id,
+        a.Timestamp as team_timestamp,
+        a.Map as team_map
+    from
+        ddnet_stats.teamrace a
+        join ddnet_stats.teamrace b on a.ID = b.ID
+    where
+        a.Name != b.Name
+        and a.Timestamp < '2022-01-01 06:00:00'
+        and a.Timestamp >= '2021-01-01 06:00:00'
+    group by
+        a.Name,
+        b.Name,
+        a.ID,
+        a.Timestamp,
+        a.Map
+),
+-- 组队情况
+teammate_count_2021 as (
+    select
+        Name,
+        count(distinct team_id) as team_count,
+        count(distinct teammate_name) as teammate_count
+    from
+        player_viewpoint_team_2021
+    group by
+        Name
+),
+-- 最喜爱的队友
+most_favorite_teammate_2021 as (
+    select
+        Name,
+        favorite_teammate,
+        favorite_teammate_team_count
+    from
+        (
+            select
+                Name,
+                teammate_name as favorite_teammate,
+                count(*) as favorite_teammate_team_count,
+                ROW_NUMBER() over (
+                    partition by Name
+                    order by
+                        count(*) desc
+                ) as favorite_teammate_team_count_rank
+            from
+                player_viewpoint_team_2021
+            group by
+                Name,
+                teammate_name
+        )
+    where
+        favorite_teammate_team_count_rank = 1
 )
 select
     a.Name,
@@ -522,7 +579,11 @@ select
     g.days_count_has_records_2021,
     h.player_count_2021,
     i.total_points_earned_rank,
-    j.finish_time_sum_hours_rank
+    j.finish_time_sum_hours_rank,
+    k.team_count,
+    k.teammate_count,
+    l.favorite_teammate,
+    l.favorite_teammate_team_count
 from
     stat_2021_with_repeat a
     join stat_2021_without_repeat b on a.Name = b.Name
@@ -534,5 +595,7 @@ from
     cross join player_count_2021 h
     join points_earned_rank_2021 i on a.Name = i.Name
     join finish_time_sum_hours_rank_2021 j on a.Name = j.Name
+    join teammate_count_2021 k on a.Name = k.Name
+    join most_favorite_teammate_2021 l on a.Name = l.Name
 order by
     total_points_earned desc;

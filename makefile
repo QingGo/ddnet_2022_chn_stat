@@ -43,7 +43,7 @@ deploy_fe:
 	npm run upload;
 
 .PHONY: deploy_update_cards
-deploy_update_cards: deploy_db deploy_fe restart_be
+deploy_update_cards: deploy_db restart_be deploy_fe 
 
 .PHONY: deploy_all
-deploy_all: deploy_db deploy_fe deploy_be
+deploy_all: deploy_db deploy_be deploy_fe 
