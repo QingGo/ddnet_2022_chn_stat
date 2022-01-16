@@ -144,7 +144,7 @@ most_finished_map_2021_table as (
         map_name_rank_finished_count_desc = 1
 ),
 -- 不对记录去重统计的基本信息表
-stat_with_repeat as (
+stat_2021_with_repeat as (
     select
         Name,
         count(Map) as finish_map_count,
@@ -445,9 +445,34 @@ days_count_has_records_2021 as (
     group by
         Name
 ),
--- 分数超越百分比
-points_earned_over_percent_2021 as (
-    select Name from stat_2021_without_repeat 
+-- 2021 总玩家数
+player_count_2021 as (
+    select
+        count(*) as player_count_2021
+    from
+        stat_2021_without_repeat
+),
+-- 2021 新增分数排名
+points_earned_rank_2021 as (
+    select
+        Name,
+        rank() over (
+            order by
+                total_points_earned desc
+        ) as total_points_earned_rank
+    from
+        stat_2021_without_repeat
+),
+-- 2021 过图时间排名
+finish_time_sum_hours_rank_2021 as (
+    select
+        Name,
+        rank() over (
+            order by
+                finish_time_sum_hours desc
+        ) as finish_time_sum_hours_rank
+    from
+        stat_2021_with_repeat
 )
 select
     a.Name,
@@ -495,14 +520,20 @@ select
     e.most_finish_hour_count,
     f.most_finish_weekday,
     f.most_finish_weekday_count,
-    g.days_count_has_records_2021
+    g.days_count_has_records_2021,
+    h.player_count_2021,
+    i.total_points_earned_rank,
+    j.finish_time_sum_hours_rank
 from
-    stat_with_repeat a
+    stat_2021_with_repeat a
     join stat_2021_without_repeat b on a.Name = b.Name
     join most_finished_map_2021_table c on a.Name = c.Name
     join day_latest_finish_time_2021 d on a.Name = d.Name
     join day_most_finish_hour_2021 e on a.Name = e.Name
     join day_most_finish_weekday_2021 f on a.Name = f.Name
     join days_count_has_records_2021 g on a.Name = g.Name
+    cross join player_count_2021 h
+    join points_earned_rank_2021 i on a.Name = i.Name
+    join finish_time_sum_hours_rank_2021 j on a.Name = j.Name
 order by
     total_points_earned desc;
