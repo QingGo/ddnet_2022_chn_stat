@@ -1,6 +1,5 @@
 -- use bigquery
 -- to-do?
--- 分数/过图时间 超越了 %xx 的玩家
 -- 最多组队的人，同伴名？
 -- 原始过图记录+地图全表
 with ddnet_race_with_map_infos as (

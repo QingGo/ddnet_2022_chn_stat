@@ -41,3 +41,9 @@ deploy_fe:
 	cd ddnet_2022_chn_stat_frontend; \
 	npm run build; \
 	npm run upload;
+
+.PHONY: deploy_update_cards
+deploy_update_cards: deploy_db deploy_fe restart_be
+
+.PHONY: deploy_all
+deploy_all: deploy_db deploy_fe deploy_be
