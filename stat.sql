@@ -150,61 +150,61 @@ stat_2021_with_repeat as (
         sum(Points) as finish_points_total,
         sum(
             case
-                when Server_Type = 'Fun' then Points
+                when Server_Type = 'Fun' then 1
                 else 0
             end
         ) as finish_fun_map_count,
         sum(
             case
-                when Server_Type = 'Race' then Points
+                when Server_Type = 'Race' then 1
                 else 0
             end
         ) as finish_race_map_count,
         sum(
             case
-                when Server_Type = 'Solo' then Points
+                when Server_Type = 'Solo' then 1
                 else 0
             end
         ) as finish_solo_map_count,
         sum(
             case
-                when Server_Type = 'DDmaX' then Points
+                when Server_Type = 'DDmaX' then 1
                 else 0
             end
         ) as finish_ddmax_map_count,
         sum(
             case
-                when Server_Type = 'Dummy' then Points
+                when Server_Type = 'Dummy' then 1
                 else 0
             end
         ) as finish_dummy_map_count,
         sum(
             case
-                when Server_Type = 'Brutal' then Points
+                when Server_Type = 'Brutal' then 1
                 else 0
             end
         ) as finish_brutal_map_count,
         sum(
             case
-                when Server_Type = 'Insane' then Points
+                when Server_Type = 'Insane' then 1
                 else 0
             end
         ) as finish_insane_map_count,
         sum(
             case
-                when Server_Type = 'Novice' then Points
+                when Server_Type = 'Novice' then 1
                 else 0
             end
         ) as finish_novice_map_count,
         sum(
             case
-                when Server_Type = 'Moderate' then Points
+                when Server_Type = 'Moderate' then 1
                 else 0
             end
         ) as finish_moderate_map_count,
         sum(
             case
-                when Server_Type = 'Oldschool' then Points
+                when Server_Type = 'Oldschool' then 1
                 else 0
             end
         ) as finish_oldschool_map_count
